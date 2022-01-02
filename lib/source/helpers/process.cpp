@@ -31,4 +31,14 @@ namespace mod::hlp {
         return std::nullopt;
     }
 
+    u64 getFunctionAddress(const std::string &moduleName, const std::string &functionName) {
+        HMODULE module = ::GetModuleHandleA(moduleName.c_str());
+
+        auto address = ::GetProcAddress(module, functionName.c_str());
+
+        ::CloseHandle(module);
+
+        return reinterpret_cast<u64>(address);
+    }
+
 }
