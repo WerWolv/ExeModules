@@ -18,7 +18,7 @@ int main() {
 
     STARTUPINFOW startupInfo = { };
     PROCESS_INFORMATION processInfo = { };
-    
+
     // Start launch executable
     {
         log::info(L"Starting launcher executable '{}'...", LIBCHEAT_LAUNCH_EXECUTABLE_PATH);
@@ -41,6 +41,8 @@ int main() {
     std::optional<u32> pid;
     {
         log::info(L"Waiting for main executable '{}' to be launched...", LIBCHEAT_PROCESS_NAME);
+
+        // Wait until the process we want to attach to becomes available
         while (true) {
             pid = cht::hlp::getProcessId(LIBCHEAT_PROCESS_NAME);
 
@@ -52,6 +54,7 @@ int main() {
 
         log::info("Main executable launched! PID: {}", pid.value());
 
+        // Attach to process
         hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid.value());
         if (hProcess == INVALID_HANDLE_VALUE) {
             log::fatal("Failed to attach to main executable!");
@@ -78,6 +81,7 @@ int main() {
 
         log::info(L"Loading cheat '{}'...", entry.path().filename().native());
 
+        // Ask the injected libcheat to load the new cheat and return its load address
         auto cheatModule = libCheat.call<HMODULE>("loadCheat", hlp::StaticString<wchar_t, MAX_PATH>(entry.path().native()));
         if (!cheatModule.has_value()) {
             log::error(L"Failed to load cheat '{}'!", entry.path().native());
@@ -87,11 +91,20 @@ int main() {
         void *address = reinterpret_cast<void*>(*cheatModule);
         log::info("Loaded cheat at 0x{}", address);
 
+        // Ask cheat to attach stdout to the main console
         auto cheat = cht::hlp::InjectFile(entry.path(), hProcess, *cheatModule);
         if (cheat.call<void>("attachConsole", ::GetCurrentProcessId()) == Result::Err) {
             log::error("Cheat failed to attach to loader console!");
             continue;
-        }}
+        }
+
+        // Call main function of cheat
+        if (cheat.call<void>("main") == Result::Err) {
+            log::error("Failed to initialize cheat!");
+            continue;
+        }
+
+    }
 
     // Keep loader and its console open until main process exits
     ::WaitForSingleObject(hProcess, INFINITE);

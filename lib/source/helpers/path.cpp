@@ -10,7 +10,7 @@ namespace cht::hlp {
     }
 
     fs::path getLibraryPath() {
-        return getModulePath(::GetModuleHandle("libcheat.dll"));
+        return getModulePath(::GetModuleHandle(LIBCHEAT_FILE_NAME));
     }
 
     fs::path getCheatsFolderPath() {
