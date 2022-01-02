@@ -1,13 +1,12 @@
-#include <cht/base.hpp>
+#include <mod/base.hpp>
 
-#include <cht/api/ipc.hpp>
-#include <cht/helpers/path.hpp>
+#include <mod/api/ipc.hpp>
+#include <mod/helpers/path.hpp>
 
-extern "C" [[maybe_unused]] cht::Result loadCheat(cht::api::IPCMessage *message) {
-    auto [in, out] = cht::api::unmarshal<wchar_t, HMODULE>(message);
+extern "C" [[maybe_unused]] mod::Result loadModule(mod::api::IPCMessage *message) {
+    auto [in, out] = mod::api::unmarshal<wchar_t, HMODULE>(message);
 
-    std::wstring path(&in);
-    out = ::LoadLibraryW(path.c_str());
+    out = ::LoadLibraryW(std::wstring(&in).c_str());
 
-    return cht::Result::Ok;
+    return mod::Result::Ok;
 }

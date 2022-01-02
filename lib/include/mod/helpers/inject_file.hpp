@@ -1,14 +1,14 @@
 #pragma once
 
-#include <cht/base.hpp>
-#include <cht/helpers/path.hpp>
-#include <cht/helpers/utils.hpp>
+#include <mod/base.hpp>
+#include <mod/helpers/path.hpp>
+#include <mod/helpers/utils.hpp>
 
 #include <optional>
 #include <span>
 #include <concepts>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     template<typename T>
     concept pod_type = std::is_standard_layout_v<T> && std::is_trivial_v<T>;

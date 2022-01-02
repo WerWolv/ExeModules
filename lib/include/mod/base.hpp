@@ -22,7 +22,7 @@ using f32   = float;
 using f64   = double;
 using f128  = long double;
 
-namespace cht {
+namespace mod {
 
     enum class Result {
         Ok,

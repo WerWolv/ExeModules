@@ -1,30 +1,30 @@
-#include <cht/base.hpp>
+#include <mod/base.hpp>
 
-#include <cht/helpers/path.hpp>
-#include <cht/helpers/process.hpp>
-#include <cht/helpers/inject_file.hpp>
-#include <cht/helpers/guards.hpp>
-#include <cht/helpers/logger.hpp>
+#include <mod/helpers/path.hpp>
+#include <mod/helpers/process.hpp>
+#include <mod/helpers/inject_file.hpp>
+#include <mod/helpers/guards.hpp>
+#include <mod/helpers/logger.hpp>
 
 #include <chrono>
 #include <thread>
 #include <vector>
 
-using namespace cht;
+using namespace mod;
 using namespace std::literals::chrono_literals;
 
 int main() {
-    log::info("Cheat Loader\n");
+    log::info("Starting loader...");
 
     STARTUPINFOW startupInfo = { };
     PROCESS_INFORMATION processInfo = { };
 
     // Start launch executable
     {
-        log::info(L"Starting launcher executable '{}'...", LIBCHEAT_LAUNCH_EXECUTABLE_PATH);
+        log::info(L"Starting launcher executable '{}'...", LAUNCH_EXECUTABLE_PATH);
 
         if (!::CreateProcessW(
-                LIBCHEAT_LAUNCH_EXECUTABLE_PATH, ::GetCommandLineW(),
+                LAUNCH_EXECUTABLE_PATH, ::GetCommandLineW(),
                 nullptr, nullptr, TRUE, 0, nullptr, nullptr,
                 &startupInfo, &processInfo
             ))
@@ -40,22 +40,23 @@ int main() {
 
     std::optional<u32> pid;
     {
-        log::info(L"Waiting for main executable '{}' to be launched...", LIBCHEAT_PROCESS_NAME);
+        log::info(L"Waiting for main executable '{}' to be launched...", MAIN_PROCESS_NAME);
 
         // Wait until the process we want to attach to becomes available
         while (true) {
-            pid = cht::hlp::getProcessId(LIBCHEAT_PROCESS_NAME);
+            pid = mod::hlp::getProcessId(MAIN_PROCESS_NAME);
 
             if (pid.has_value())
                 break;
             else
-                std::this_thread::sleep_for(1s);
+                std::this_thread::sleep_for(100ms);
         }
 
         log::info("Main executable launched! PID: {}", pid.value());
 
         // Attach to process
         hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid.value());
+
         if (hProcess == INVALID_HANDLE_VALUE) {
             log::fatal("Failed to attach to main executable!");
             return EXIT_FAILURE;
@@ -63,44 +64,44 @@ int main() {
 
     }
 
-    // Inject libcheat into target process
-    cht::hlp::InjectFile libCheat(cht::hlp::getLibraryPath());
-    if (libCheat.injectInto(hProcess) == Result::Err) {
-        log::fatal("Failed to inject libcheat!");
+    // Inject libmodule into target process
+    mod::hlp::InjectFile libModule(mod::hlp::getLibraryPath());
+    if (libModule.injectInto(hProcess) == Result::Err) {
+        log::fatal("Failed to inject libmodule!");
         return EXIT_FAILURE;
     }
 
 
-    // Inject all cheats into target process
-    for (const auto &entry : fs::recursive_directory_iterator(cht::hlp::getCheatsFolderPath())) {
+    // Inject all modules into target process
+    for (const auto &entry : fs::recursive_directory_iterator(mod::hlp::getModulesFolderPath())) {
         // Skip all entries that are not regular files
         if (!entry.is_regular_file()) continue;
 
-        // Skip all files that don't have the .cht file extension
-        if (entry.path().extension() != ".cht") continue;
+        // Skip all files that don't have the .mod file extension
+        if (entry.path().extension() != ".mod") continue;
 
-        log::info(L"Loading cheat '{}'...", entry.path().filename().native());
+        log::info(L"Loading module '{}'...", entry.path().filename().native());
 
-        // Ask the injected libcheat to load the new cheat and return its load address
-        auto cheatModule = libCheat.call<HMODULE>("loadCheat", hlp::StaticString<wchar_t, MAX_PATH>(entry.path().native()));
-        if (!cheatModule.has_value()) {
-            log::error(L"Failed to load cheat '{}'!", entry.path().native());
+        // Ask the injected libmodule to load the new module and return its load address
+        auto hModule = libModule.call<HMODULE>("loadModule", hlp::StaticString<wchar_t, MAX_PATH>(entry.path().native()));
+        if (!hModule.has_value()) {
+            log::error(L"Failed to load module '{}'!", entry.path().native());
             continue;
         }
 
-        void *address = reinterpret_cast<void*>(*cheatModule);
-        log::info("Loaded cheat at 0x{}", address);
+        void *address = reinterpret_cast<void*>(*hModule);
+        log::info("Loaded module at {}", address);
 
-        // Ask cheat to attach stdout to the main console
-        auto cheat = cht::hlp::InjectFile(entry.path(), hProcess, *cheatModule);
-        if (cheat.call<void>("attachConsole", ::GetCurrentProcessId()) == Result::Err) {
-            log::error("Cheat failed to attach to loader console!");
+        // Ask module to attach stdout to the main console
+        auto module = mod::hlp::InjectFile(entry.path(), hProcess, *hModule);
+        if (module.call<void>("attachConsole", ::GetCurrentProcessId()) == Result::Err) {
+            log::error("Module failed to attach to loader console!");
             continue;
         }
 
-        // Call main function of cheat
-        if (cheat.call<void>("main") == Result::Err) {
-            log::error("Failed to initialize cheat!");
+        // Call main function of module
+        if (module.call<void>("main") == Result::Err) {
+            log::error("Failed to initialize module!");
             continue;
         }
 

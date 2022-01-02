@@ -1,11 +1,11 @@
-#include <cht/helpers/inject_file.hpp>
+#include <mod/helpers/inject_file.hpp>
 
-#include <cht/helpers/guards.hpp>
-#include <cht/api/ipc.hpp>
+#include <mod/helpers/guards.hpp>
+#include <mod/api/ipc.hpp>
 
 #include <utility>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     InjectFile::InjectFile(fs::path path) : m_path(std::move(path)) {
 
@@ -70,7 +70,7 @@ namespace cht::hlp {
 
         // Marshal IPC message and place it in the remote process's memory
         void *messageBuffer = nullptr;
-        api::IPCMessage message = { hlp::magic("CHT0") };
+        api::IPCMessage message = { hlp::magic("IPC0") };
 
         // Allocate space in the remote process to fit the marshaled input parameters
         if (!inBuffer.empty()) {

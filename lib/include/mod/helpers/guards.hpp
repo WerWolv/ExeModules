@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     #define TOKEN_CONCAT_IMPL(x, y) x ## y
     #define TOKEN_CONCAT(x, y) TOKEN_CONCAT_IMPL(x, y)
@@ -10,7 +10,7 @@ namespace cht::hlp {
 
     namespace scope_guard {
 
-        #define SCOPE_GUARD ::cht::hlp::scope_guard::ScopeGuardOnExit() + [&]()
+        #define SCOPE_GUARD ::mod::hlp::scope_guard::ScopeGuardOnExit() + [&]()
         #define ON_SCOPE_EXIT auto ANONYMOUS_VARIABLE(SCOPE_EXIT_) = SCOPE_GUARD
 
         template<class F>
@@ -41,7 +41,7 @@ namespace cht::hlp {
 
     namespace first_time_exec {
 
-        #define FIRST_TIME static auto ANONYMOUS_VARIABLE(FIRST_TIME_) = ::cht::hlp::first_time_exec::FirstTimeExecutor() + [&]()
+        #define FIRST_TIME static auto ANONYMOUS_VARIABLE(FIRST_TIME_) = ::mod::hlp::first_time_exec::FirstTimeExecutor() + [&]()
 
         template<class F>
         class FirstTimeExecute {
@@ -62,7 +62,7 @@ namespace cht::hlp {
 
     namespace final_cleanup {
 
-        #define FINAL_CLEANUP static auto ANONYMOUS_VARIABLE(ON_EXIT_) = ::cht::hlp::final_cleanup::FinalCleanupExecutor() + [&]()
+        #define FINAL_CLEANUP static auto ANONYMOUS_VARIABLE(ON_EXIT_) = ::mod::hlp::final_cleanup::FinalCleanupExecutor() + [&]()
 
         template<class F>
         class FinalCleanupExecute {

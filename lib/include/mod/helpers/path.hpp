@@ -1,12 +1,12 @@
 #pragma once
 
-#include <cht/base.hpp>
+#include <mod/base.hpp>
 
 #include <filesystem>
 
 namespace fs = std::filesystem;
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     [[nodiscard]]
     fs::path getModulePath(HMODULE module);
@@ -15,6 +15,6 @@ namespace cht::hlp {
     fs::path getLibraryPath();
 
     [[nodiscard]]
-    fs::path getCheatsFolderPath();
+    fs::path getModulesFolderPath();
 
 }

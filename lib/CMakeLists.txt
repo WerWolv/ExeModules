@@ -1,6 +1,6 @@
-project(libcheat)
+project(libmodule)
 
-add_library(libcheat SHARED
+add_library(${PROJECT_NAME} SHARED
         source/helpers/path.cpp
         source/helpers/inject_file.cpp
         source/helpers/process.cpp
@@ -9,9 +9,9 @@ add_library(libcheat SHARED
         source/api/loader.cpp
 )
 
-set_target_properties(libcheat PROPERTIES PREFIX "")
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_include_directories(libcheat PUBLIC include)
-target_link_libraries(libcheat PUBLIC fmt::fmt-header-only)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
-target_compile_definitions(libcheat PRIVATE LOGGER_SOURCE_NAME="lib" LIBCHEAT_FILE_NAME="$<TARGET_FILE_NAME:libcheat>")
+target_compile_definitions(${PROJECT_NAME} PRIVATE LOGGER_SOURCE_NAME="lib" LIBRARY_FILE_NAME="$<TARGET_FILE_NAME:${PROJECT_NAME}>")

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cht/base.hpp>
+#include <mod/base.hpp>
 
 #include <string_view>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     consteval u32 magic(std::string_view str) {
         u32 magic = 0x00;

@@ -1,6 +1,6 @@
-#include <cht/helpers/path.hpp>
+#include <mod/helpers/path.hpp>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     fs::path getModulePath(HMODULE module) {
         std::wstring buffer(MAX_PATH, '\x00');
@@ -10,11 +10,11 @@ namespace cht::hlp {
     }
 
     fs::path getLibraryPath() {
-        return getModulePath(::GetModuleHandle(LIBCHEAT_FILE_NAME));
+        return getModulePath(::GetModuleHandle(LIBRARY_FILE_NAME));
     }
 
-    fs::path getCheatsFolderPath() {
-        return getLibraryPath().parent_path() / "cheats";
+    fs::path getModulesFolderPath() {
+        return getLibraryPath().parent_path() / "modules";
     }
 
 }

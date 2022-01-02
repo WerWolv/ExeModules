@@ -1,14 +1,14 @@
 #pragma once
 
-#include <cht/base.hpp>
+#include <mod/base.hpp>
 
-#include <cht/helpers/utils.hpp>
+#include <mod/helpers/utils.hpp>
 
 #include <array>
 #include <span>
 #include <string>
 
-namespace cht::api {
+namespace mod::api {
 
     struct IPCMessage {
         u32 magic;
@@ -16,12 +16,12 @@ namespace cht::api {
     };
 
     template<typename In, typename Out = void> requires (!std::same_as<Out, void>)
-    std::pair<const In&, Out&> unmarshal(const IPCMessage *message) {
+    [[nodiscard]] std::pair<const In&, Out&> unmarshal(const IPCMessage *message) {
         return { *reinterpret_cast<const In*>(message->inBuffer.data()), *reinterpret_cast<Out*>(message->outBuffer.data()) };
     }
 
     template<typename In, typename Out = void> requires (std::same_as<Out, void>)
-    const In& unmarshal(const IPCMessage *message) {
+    [[nodiscard]] const In& unmarshal(const IPCMessage *message) {
         return *reinterpret_cast<const In*>(message->inBuffer.data());
     }
 

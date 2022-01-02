@@ -4,7 +4,7 @@
 #include <fmt/color.h>
 #include <fmt/xchar.h>
 
-namespace cht::log {
+namespace mod::log {
 
     template<typename ... T>
     void debug(const fmt::format_string<T...> &fmt, T&& ... args) {

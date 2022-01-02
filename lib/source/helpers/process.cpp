@@ -1,10 +1,10 @@
-#include <cht/helpers/process.hpp>
+#include <mod/helpers/process.hpp>
 
-#include <cht/helpers/guards.hpp>
+#include <mod/helpers/guards.hpp>
 
 #include <TlHelp32.h>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     std::optional<u32> getProcessId(const std::wstring &processName) {
         // Create process snapshot

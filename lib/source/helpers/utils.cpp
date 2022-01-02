@@ -1,9 +1,9 @@
-#include <cht/helpers/utils.hpp>
+#include <mod/helpers/utils.hpp>
 
 #include <cstdio>
 #include <fmt/format.h>
 
-namespace cht::hlp {
+namespace mod::hlp {
 
     void redirectStdio(u32 pid) {
         // Attach to console
